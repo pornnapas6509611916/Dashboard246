@@ -15,11 +15,6 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 
-#to use thai font
-!wget -q https://github.com/Phonbopit/sarabun-webfont/raw/master/fonts/thsarabunnew-webfont.ttf
-mpl.font_manager.fontManager.addfont("thsarabunnew-webfont.ttf")
-mpl.rc('font',family="TH Sarabun New",size = '16')
-
 st.set_page_config(
     page_title="Dashboard",
     page_icon="🏂",
@@ -114,33 +109,38 @@ def make_heatmap(input_df, input_y, input_x, input_color, input_color_theme):
 
   return heatmap
 
-import altair as alt
-
-alt.themes.enable("dark")
-
-heatmap = alt.Chart(df_reshaped).mark_rect().encode(
-        y=alt.Y('Categories:O', axis=alt.Axis(title="Categories", titleFontSize=16, titlePadding=15, titleFontWeight=900, labelAngle=0)),
-        x=alt.X('Ranking:O', axis=alt.Axis(title="Ranking", titleFontSize=16, titlePadding=15, titleFontWeight=900, labelAngle=0)),
-        color=alt.Color('max(population):Q',
-                         legend=alt.Legend(title=" "),
-                         scale=alt.Scale(scheme="blueorange")),
-        stroke=alt.value('black'),
-        strokeWidth=alt.value(0.25),
-        #tooltip=[
-        #    alt.Tooltip('year:O', title='Year'),
-        #    alt.Tooltip('population:Q', title='Population')
-        #]
-    ).properties(width=900
-    #).configure_legend(orient='bottom', titleFontSize=16, labelFontSize=14, titlePadding=0
-    #).configure_axisX(labelFontSize=14)
-    ).configure_axis(
-    labelFontSize=12,
-    titleFontSize=12
+def make_donut(input_df, input_population, input_categories):
+    donut_chart = alt.Chart(input_df).mark_arc().encode(
+        theta=f'{input_population}:Q',
+        color=alt.Color(f'{input_categories}:N', scale=alt.Scale(scheme='category20')),
+        tooltip=[f'{input_categories}', f'{input_population}']
+    ).properties(
+        width=200,
+        height=200,
+        title='Donut Chart'
     )
 
-heatmap
+    return donut_chart
+
+# สร้าง donut chart สำหรับ Ranking
+def make_donut(input_df, input_population, input_categories):
+  donut_chart = alt.Chart(input_df).mark_arc().encode(
+      theta=f'{input_population}:Q',
+      color=alt.Color(f'{input_categories}:N', scale=alt.Scale(scheme='category20')),
+      tooltip=['Categories', 'population']
+  ).properties(
+      width=200,
+      height=200,
+      title='Ranking'
+  )
+
+  return donut_chart
 
 col = st.columns((1.5, 4.5, 2), gap='medium')
+
+with col[0]:
+  donut_chart = make_donut(df_reshaped, 'population', 'Categories')
+  st.altair_chart(donut_chart)
 
 with col[1]:
     st.markdown('#### Total Ranking')
