@@ -7,6 +7,8 @@ Original file is located at
     https://colab.research.google.com/drive/1RARxwheUlDqQZfNkz7hJQ47Kop2ePPv9
 """
 
+pip install streamlit
+
 import streamlit as st
 import pandas as pd
 import altair as alt
@@ -14,6 +16,11 @@ import plotly.express as px
 import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib as mpl
+
+#to use thai font
+!wget -q https://github.com/Phonbopit/sarabun-webfont/raw/master/fonts/thsarabunnew-webfont.ttf
+mpl.font_manager.fontManager.addfont("thsarabunnew-webfont.ttf")
+mpl.rc('font',family="TH Sarabun New",size = '16')
 
 st.set_page_config(
     page_title="Dashboard",
@@ -122,24 +129,10 @@ def make_donut(input_df, input_population, input_categories):
 
     return donut_chart
 
-# สร้าง donut chart สำหรับ Ranking
-def make_donut(input_df, input_population, input_categories):
-  donut_chart = alt.Chart(input_df).mark_arc().encode(
-      theta=f'{input_population}:Q',
-      color=alt.Color(f'{input_categories}:N', scale=alt.Scale(scheme='category20')),
-      tooltip=['Categories', 'population']
-  ).properties(
-      width=200,
-      height=200,
-      title='Ranking'
-  )
-
-  return donut_chart
-
 col = st.columns((1.5, 4.5, 2), gap='medium')
 
 with col[0]:
-  donut_chart = make_donut(df_reshaped, 'population', 'Categories')
+  donut_chart = make_donut(df_selected_Ranking, 'population', 'Categories')
   st.altair_chart(donut_chart)
 
 with col[1]:
