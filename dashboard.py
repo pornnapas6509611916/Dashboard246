@@ -7,8 +7,6 @@ Original file is located at
     https://colab.research.google.com/drive/1HywERjiYqxQw4Nvqt2hVauo4z_z0kfLW
 """
 
-pip install plotly
-
 import streamlit as st
 import pandas as pd
 import altair as alt
@@ -32,6 +30,8 @@ df = df.rename(columns={' [ด้านการเดินทางและ�
                          ' [ด้านการศึกษา]': 'ด้านการศึกษา',
                          ' [ด้านสุขภาพ]': 'ด้านสุขภาพ',
                          ' [ด้านสิ่งแวดล้อม]': 'ด้านสิ่งแวดล้อม'})
+
+
 
 counts_5 = []
 counts_4 = []
@@ -133,23 +133,24 @@ def make_donut(input_df, input_population, input_Satisfaction):
 
     return donut_chart
 
-import altair as alt
+# Create a function to generate the gauge chart for a category
+def make_gauge(category, average):
+    color_scale = alt.Scale(
 
-def make_gauge(input_df, input_population, input_Satisfaction):
-    gauge_chart = alt.Chart(input_df).mark_bar().encode(
-        y=alt.Y(f'{input_population}:Q', axis=None),
-        color=alt.Color(f'{input_Satisfaction}:N', scale=alt.Scale(scheme='category20')),
-        tooltip=[f'{input_Satisfaction}', f'{input_population}']
+        domain=[1, 1.8, 2.6, 3.4, 4.2, 5],
+        range=["red", "orange", "yellow", "lightgreen", "green"]
+    )
+
+    gauge_chart = alt.Chart(pd.DataFrame({'Category': [category], 'Average': [average]})).mark_bar().encode(
+        x=alt.X('Average:Q', axis=None),
+        color=alt.Color('Average:Q', scale=color_scale, legend=None)
     ).properties(
+        title=category,
         width=200,
-        height=200,
-        title='Gauge Chart'
+        height=100
     )
 
     return gauge_chart
-
-# Example usage:
-# gauge_chart = make_gauge(df, 'population', 'Satisfaction')
 
 col = st.columns((1.5, 4.5, 2), gap='medium')
 
@@ -183,6 +184,11 @@ with col[2]:
                      )}
                  )
 
+with col[2]:
+    st.markdown('#### Mean Satisfaction')
+    gauge_chart = make_gauge('Satisfaction', avg1)  # Use the function make_gauge correctly
+    st.altair_chart(gauge_chart)  # Use the correct variable name for the gauge chart
+
 # Define the categories and their average satisfaction scores
 categories = ['การเดินทางและความปลอดภัย', 'การศึกษา', 'สุขภาพ', 'สิ่งแวดล้อม']
 averages = [avg1, avg2, avg3, avg4]
@@ -206,3 +212,26 @@ for i, category in enumerate(categories):
     ))
     fig.update_layout()
     fig.show()
+
+for i, category in enumerate(categories):
+    data = pd.DataFrame({'category': [category], 'average': [averages[i]]})
+
+    # Define color domain for the gauge
+    color_domain = [1, 1.8, 2.6, 3.4, 4.2, 5]
+    color_range = ['red', 'orange', 'yellow', 'lightgreen', 'green']
+
+    chart = alt.Chart(data).mark_bar(size=100).encode(
+        x='average:Q',
+        color=alt.Color('average:Q', scale=alt.Scale(domain=color_domain, range=color_range)),
+        tooltip=['average:Q']
+    ).properties(
+        width=200,
+        height=150
+    ).configure_view(
+        strokeWidth=0
+    ).configure_axis(
+        ticks=False,
+        labels=False
+    )
+
+    st.write(chart)
