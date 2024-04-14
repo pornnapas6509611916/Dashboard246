@@ -167,7 +167,10 @@ with col[2]:
 
 with col[2]:
 # Create DataFrame
-    data = pd.DataFrame({'Categories': Categories, 'average': average})
+    data = pd.DataFrame({
+    'Categories': ['การเดินทางและความปลอดภัย', 'การศึกษา', 'สุขภาพ', 'สิ่งแวดล้อม'],
+    'average': average
+})
 
 # Define color scale for gauge
     color_scale = alt.Scale(
