@@ -10,6 +10,7 @@ Original file is located at
 import streamlit as st
 import pandas as pd
 import altair as alt
+import plotly.graph_objects as go
 
 st.set_page_config(
     page_title="🪸Dashboard",
@@ -50,17 +51,6 @@ mean_data = {
 }
 df_mean = pd.DataFrame(mean_data)
 
-
-
-data = {
-    'Categories': ['การเดินทางและความปลอดภัย', 'การศึกษา', 'สุขภาพ', 'สิ่งแวดล้อม'],
-    'Satisfaction_5': counts_5,
-    'Satisfaction_4': counts_4,
-    'Satisfaction_3': counts_3,
-    'Satisfaction_2': counts_2,
-    'Satisfaction_1': counts_1
-}
-
 data = {
     'Categories': ['การเดินทางและความปลอดภัย', 'การศึกษา', 'สุขภาพ', 'สิ่งแวดล้อม'],
     'Satisfaction_5': counts_5,
@@ -92,6 +82,14 @@ with st.sidebar:
     color_theme_list = ['blues', 'cividis', 'greens', 'inferno', 'magma', 'plasma', 'reds', 'rainbow', 'turbo', 'viridis']
     selected_color_theme = st.selectbox('Select a color theme', color_theme_list)
     print(df_selected_Categories)
+
+# คำนวณค่าเฉลี่ยของความพึงพอใจในหมวดหมู่การศึกษาตามวิธีที่ระบุ
+avg1 = ((df_reshaped[df_reshaped['Categories'] == 'การเดินทางและความปลอดภัย']['population'] * df_reshaped[df_reshaped['Categories'] == 'การเดินทางและความปลอดภัย']['Satisfaction'].str[-1].astype(int)).sum() / 102).round(2)
+avg2 = ((df_reshaped[df_reshaped['Categories'] == 'การศึกษา']['population'] * df_reshaped[df_reshaped['Categories'] == 'การศึกษา']['Satisfaction'].str[-1].astype(int)).sum() / 102).round(2)
+avg3 = ((df_reshaped[df_reshaped['Categories'] == 'สุขภาพ']['population'] * df_reshaped[df_reshaped['Categories'] == 'สุขภาพ']['Satisfaction'].str[-1].astype(int)).sum() / 102).round(2)
+avg4 = ((df_reshaped[df_reshaped['Categories'] == 'สิ่งแวดล้อม']['population'] * df_reshaped[df_reshaped['Categories'] == 'สิ่งแวดล้อม']['Satisfaction'].str[-1].astype(int)).sum() / 102).round(2)
+
+print(avg1, avg2, avg3, avg4)
 
 import altair as alt
 
@@ -133,26 +131,23 @@ def make_donut(input_df, input_population, input_Satisfaction):
 
     return donut_chart
 
-def make_gauge(input_df2, input_Categories, input_mean):
-    gauge_chart = alt.Chart(input_df2).mark_arc().encode(
-        theta=f'{input_mean}:Q',
-        color=alt.Color(f'{input_mean}:N', scale=alt.Scale(scheme='category20')),
-        tooltip=[f'{input_Categories}', f'{input_mean}']
+import altair as alt
+
+def make_gauge(input_df, input_population, input_Satisfaction):
+    gauge_chart = alt.Chart(input_df).mark_bar().encode(
+        y=alt.Y(f'{input_population}:Q', axis=None),
+        color=alt.Color(f'{input_Satisfaction}:N', scale=alt.Scale(scheme='category20')),
+        tooltip=[f'{input_Satisfaction}', f'{input_population}']
     ).properties(
         width=200,
         height=200,
         title='Gauge Chart'
     )
 
-    gauge_chart = gauge_chart.properties(
-        angle=90,
-        arc=alt.Arc(
-            innerRadius=0.6,
-            outerRadius=0.9
-        )
-    )
-
     return gauge_chart
+
+# Example usage:
+# gauge_chart = make_gauge(df, 'population', 'Satisfaction')
 
 col = st.columns((1.5, 4.5, 2), gap='medium')
 
@@ -161,8 +156,8 @@ with col[0]:
     donut_chart = make_donut(df_selected_Categories, 'population', 'Satisfaction')
     st.altair_chart(donut_chart)
 
-with col[0]:
-    st.markdown('#### Total Categories')
+with col[1]:
+    st.markdown('#### Total Ranking')
 
     heatmap = make_heatmap(df_reshaped, 'Satisfaction', 'Categories', 'population', selected_color_theme)
     st.altair_chart(heatmap, use_container_width=True)
@@ -185,3 +180,28 @@ with col[2]:
                         max_value=max(df_selected_Categories_sorted.population),
                      )}
                  )
+
+# Define the categories and their average satisfaction scores
+categories = ['การเดินทางและความปลอดภัย', 'การศึกษา', 'สุขภาพ', 'สิ่งแวดล้อม']
+averages = [avg1, avg2, avg3, avg4]
+
+# Create four separate gauge charts
+for i, category in enumerate(categories):
+    fig = go.Figure(go.Indicator(
+        domain={'x': [0, 1], 'y': [0, 1]},
+        value=averages[i],
+        mode="gauge+number",
+        title={'text': category},
+        gauge={'axis': {'range': [1, 5]},
+               'bar': {'color': "darkblue"},
+               'steps': [
+                   {'range': [1, 1.8], 'color': "red"},
+                   {'range': [1.8, 2.6], 'color': "orange"},
+                   {'range': [2.6, 3.4], 'color': "yellow"},
+                   {'range': [3.4, 4.2], 'color': "lightgreen"},
+                   {'range': [4.2, 5], 'color': "green"}],
+        }
+    ))
+    fig.update_layout(title=f'Satisfaction Gauge Chart - {category}')
+    fig.show()
+
