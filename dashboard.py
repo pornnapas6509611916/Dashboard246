@@ -165,52 +165,56 @@ with col[2]:
     heatmap = make_heatmap(df_reshaped, 'Satisfaction', 'Categories', 'population', selected_color_theme)
     st.altair_chart(heatmap, use_container_width=True)
 
-with col[2]:
 # Create DataFrame
-    data = pd.DataFrame({
+data = pd.DataFrame({
     'Categories': ['การเดินทางและความปลอดภัย', 'การศึกษา', 'สุขภาพ', 'สิ่งแวดล้อม'],
     'average': average
 })
 
 # Define color scale for gauge
-    color_scale = alt.Scale(
-        domain=[3.5, 3.7, 3.9, 4.0, 4.2],
-       range=['red', 'orange', 'yellow', 'lightgreen', 'green']
-    )
+color_scale = alt.Scale(
+    domain=[3.5, 3.7, 3.9, 4.0, 4.2],
+    range=['red', 'orange', 'yellow', 'lightgreen', 'green']
+)
 
-# Create Gauge Chart using Altair
-    bar_chart = alt.Chart(data).mark_bar().encode(
-       x=alt.X('Categories', title=None),
-       y=alt.Y('average', title=None, scale=alt.Scale(domain=(0, 5))),
-       color=alt.Color('average:Q', scale=color_scale, legend=None),
-       tooltip=['Categories', 'average']
+# Create Legend
+legend = alt.Chart(pd.DataFrame({'value': [3.5, 3.7, 3.9, 4.0, 4.2]})).mark_rect().encode(
+    y=alt.Y('value:O', axis=alt.Axis(title='Value')),
+    color=alt.Color('value:Q', scale=color_scale)
+)
+
+with col[2]:
+# Create a selectbox for choosing categories
+    selected_category = st.selectbox('Select a category:', data['Categories'])
+
+# Filter data based on the selected category
+    filtered_data = data[data['Categories'] == selected_category]
+
+# Create Gauge Chart using Altair for the selected category
+    bar_chart_selected = alt.Chart(filtered_data).mark_bar().encode(
+      x=alt.X('Categories', title=None),
+      y=alt.Y('average', title=None, scale=alt.Scale(domain=(0, 5))),
+      color=alt.Color('average:Q', scale=color_scale, legend=None),
+      tooltip=['Categories', 'average']
     ).properties(
         width=200,
         height=200
     )
 
-# Add full value text
-    text = bar_chart.mark_text(
-       align='center',
-       baseline='bottom',
+# Add full value text for the selected category
+    text_selected = bar_chart_selected.mark_text(
+      align='center',
+      baseline='bottom',
         dx=0,
         dy=-5,  # ระยะห่างจากแท่งกราฟ
-       color='black',
-       fontSize=14,  # ขนาดตัวอักษร
+      color='black',
+      fontSize=14,  # ขนาดตัวอักษร
     ).encode(
-       text=alt.Text('average:Q', format='.1f')  # รูปแบบของตัวเลข (ทศนิยม 1 ตำแหน่ง)
+      text=alt.Text('average:Q', format='.1f')  # รูปแบบของตัวเลข (ทศนิยม 1 ตำแหน่ง)
     )
 
-    bar_chart = (bar_chart + text)
+# Combine selected Gauge Chart and Legend
+    selected_chart_with_legend = alt.hconcat(bar_chart_selected + text_selected, legend)
 
-# Create Legend
-    legend = alt.Chart(pd.DataFrame({'value': [3.5, 3.7, 3.9, 4.0, 4.2]})).mark_rect().encode(
-        y=alt.Y('value:O', axis=alt.Axis(title='Value')),
-        color=alt.Color('value:Q', scale=color_scale)
-    )
-
-# Combine Gauge Chart and Legend
-    gauge_chart_with_legend = alt.hconcat(bar_chart, legend)
-
-# Display the Gauge Chart with Legend
-    st.altair_chart(gauge_chart_with_legend, use_container_width=True)
+# Display the selected Gauge Chart with Legend
+    st.altair_chart(selected_chart_with_legend, use_container_width=True)
