@@ -137,11 +137,6 @@ def make_donut(input_df, input_population, input_Satisfaction):
 col = st.columns((1.5, 4.5, 2), gap='medium')
 
 with col[0]:
-    st.markdown('#### Satisfaction')
-    donut_chart = make_donut(df_selected_Categories, 'population', 'Satisfaction')
-    st.altair_chart(donut_chart)
-
-with col[0]:
     st.markdown('#### Top Population')
 
     st.dataframe(df_selected_Categories,
@@ -159,6 +154,11 @@ with col[0]:
                         max_value=max(df_selected_Categories_sorted.population),
                      )}
                  )
+
+with col[0]:
+    st.markdown('#### Satisfaction')
+    donut_chart = make_donut(df_selected_Categories, 'population', 'Satisfaction')
+    st.altair_chart(donut_chart)
 
 with col[1]:
     st.markdown('#### Total Ranking')
