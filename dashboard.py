@@ -82,7 +82,7 @@ with st.sidebar:
 
     color_theme_list = ['blues', 'cividis', 'greens', 'inferno', 'magma', 'plasma', 'reds', 'rainbow', 'turbo', 'viridis']
     selected_color_theme = st.selectbox('Select a color theme', color_theme_list)
-    print(df_selected_Categories)
+    print(df_selected_Categories_sorted)
 
 # คำนวณค่าเฉลี่ยของความพึงพอใจในหมวดหมู่การศึกษาตามวิธีที่ระบุ
 avg1 = ((df_reshaped[df_reshaped['Categories'] == 'การเดินทางและความปลอดภัย']['population'] * df_reshaped[df_reshaped['Categories'] == 'การเดินทางและความปลอดภัย']['Satisfaction'].str[-1].astype(int)).sum() / 102).round(2)
