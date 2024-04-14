@@ -135,7 +135,7 @@ def make_donut(input_df, input_population, input_Satisfaction):
     return donut_chart
 
 # Create DataFrame
-data = pd.DataFrame({'Categories': mean_values.index, 'Average': mean_values.values, 'FullScale': [5]*len(mean_values)})
+data = pd.DataFrame({'Categories': Categories, 'average': average, 'FullScale': [5]*len(mean_values)})
 
 # Define color scale for gauge
 color_scale = alt.Scale(
@@ -146,9 +146,9 @@ color_scale = alt.Scale(
 # Create Gauge Chart using Altair
 gauge_chart = alt.Chart(data).mark_bar().encode(
     x=alt.X('Categories', title=None),
-    y=alt.Y('FullScale', title=None, scale=alt.Scale(domain=(0, 5))),
-    color=alt.Color('Average:Q', scale=color_scale, legend=None),
-    tooltip=['Categories', 'Average']
+    y=alt.Y('FullScale', title=None, scale=alt.Scale(domain=(1, 5))),
+    color=alt.Color('average:Q', scale=color_scale, legend=None),
+    tooltip=['Categories', 'average']
 ).properties(
     width=200,
     height=200
@@ -163,11 +163,11 @@ text = gauge_chart.mark_text(
     color='black',
     fontSize=14,  # ขนาดตัวอักษร
 ).encode(
-    text=alt.Text('Average:Q', format='.1f')  # รูปแบบของตัวเลข (ทศนิยม 1 ตำแหน่ง)
+    text=alt.Text('average:Q', format='.1f')  # รูปแบบของตัวเลข (ทศนิยม 1 ตำแหน่ง)
 )
 
 # Add scale rule
-rule = alt.Chart(pd.DataFrame({'value': [0, 1, 2, 3, 4, 5]})).mark_rule(color='black', strokeWidth=2).encode(
+rule = alt.Chart(pd.DataFrame({'value': [1, 2, 3, 4, 5]})).mark_rule(color='black', strokeWidth=2).encode(
     y=alt.Y('value:O', axis=alt.Axis(labels=False, title=None)),
     tooltip=['value:Q']
 )
