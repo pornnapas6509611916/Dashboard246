@@ -134,12 +134,16 @@ def make_donut(input_df, input_population, input_Satisfaction):
 
     return donut_chart
 
-data = pd.DataFrame({'Categories': Categories, 'average': average})
+# Calculate percentage of average to full scale
+percentages = [avg / 5 * 100 for avg in average]
+
+# Create DataFrame
+data = pd.DataFrame({'Categories': Categories, 'average': average, 'percentages': percentages})
 
 # Define color scale for gauge
 color_scale = alt.Scale(
-    domain=[0, 1, 2, 3, 4, 5],
-    range=['white', 'red', 'orange', 'yellow', 'lightgreen', 'green']
+    domain=[1, 2, 3, 4, 5],
+    range=['red', 'orange', 'yellow', 'lightgreen', 'green']
 )
 
 # Create Gauge Chart using Altair
@@ -147,7 +151,7 @@ gauge_chart = alt.Chart(data).mark_bar().encode(
     x=alt.X('Categories', title=None),
     y=alt.Y('average', title=None, scale=alt.Scale(domain=(0, 5))),
     color=alt.Color('average:Q', scale=color_scale, legend=None),
-    tooltip=['Categories', 'average']
+    tooltip=['Categories', 'average', 'percentages']
 ).properties(
     width=200,
     height=200
@@ -165,13 +169,26 @@ text = gauge_chart.mark_text(
     text=alt.Text('average:Q', format='.1f')  # รูปแบบของตัวเลข (ทศนิยม 1 ตำแหน่ง)
 )
 
-# Add full value bar
-full_value_bar = alt.Chart(pd.DataFrame({'value': [5]})).mark_bar(color='black').encode(
-    y=alt.Y('value', title=None),
-    opacity=alt.value(0.5),
+# Add percentage text
+percentage_text = gauge_chart.mark_text(
+    align='center',
+    baseline='top',
+    dx=0,
+    dy=5,  # ระยะห่างจากแท่งกราฟ
+    color='black',
+    fontSize=12,  # ขนาดตัวอักษร
+    fontWeight='bold'  # ตัวหนา
+).encode(
+    text=alt.Text('percentages:Q', format='.1f', title='Percentage of full scale')  # รูปแบบของตัวเลข (ทศนิยม 1 ตำแหน่ง)
 )
 
-gauge_chart = (gauge_chart + text + full_value_bar)
+# Add scale rule
+rule = alt.Chart(pd.DataFrame({'value': [1, 2, 3, 4, 5]})).mark_rule(color='black', strokeWidth=2).encode(
+    y=alt.Y('value:O', axis=alt.Axis(labels=False, title=None)),
+    tooltip=['value:Q']
+)
+
+gauge_chart = (gauge_chart + text + percentage_text + rule)
 
 # Display the Gauge Chart
 st.altair_chart(gauge_chart, use_container_width=True)
