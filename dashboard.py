@@ -92,6 +92,8 @@ avg4 = ((df_reshaped[df_reshaped['Categories'] == 'สิ่งแวดล้�
 
 print(avg1, avg2, avg3, avg4)
 
+average = [avg1, avg2, avg3, avg4]
+
 import altair as alt
 
 alt.themes.enable("dark")
@@ -185,7 +187,7 @@ with col[2]:
 
 with col[2]:
     st.markdown('#### Mean Satisfaction')
-    gauge_chart = make_gauge('Satisfaction', avg1)  # Use the function make_gauge correctly
+    gauge_chart = make_gauge('Satisfaction', average)  # Use the function make_gauge correctly
     st.altair_chart(gauge_chart)  # Use the correct variable name for the gauge chart
 
 # Define the categories and their average satisfaction scores
