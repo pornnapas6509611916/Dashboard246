@@ -128,8 +128,7 @@ def make_donut(input_df, input_population, input_Satisfaction):
         tooltip=[f'{input_Satisfaction}', f'{input_population}']
     ).properties(
         width=200,
-        height=200,
-        title='Donut Chart'
+        height=200
     )
 
     return donut_chart
