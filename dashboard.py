@@ -160,13 +160,13 @@ with col[0]:
                      )}
                  )
 
-with col[1]:
+with col[2]:
     st.markdown('#### Satisfaction')
 
     heatmap = make_heatmap(df_reshaped, 'Satisfaction', 'Categories', 'population', selected_color_theme)
     st.altair_chart(heatmap, use_container_width=True)
 
-with col[1]:
+with col[2]:
 # Create DataFrame
     data = pd.DataFrame({'Categories': Categories, 'average': average})
 
