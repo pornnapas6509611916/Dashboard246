@@ -187,7 +187,7 @@ gauge_chart_with_legend = alt.hconcat(bar_chart, legend)
 # Display the Gauge Chart with Legend
 st.altair_chart(gauge_chart_with_legend, use_container_width=True)
 
-with col[2]:
+with col[1]:
     st.markdown('#### Total Ranking')
 
     heatmap = make_heatmap(df_reshaped, 'Satisfaction', 'Categories', 'population', selected_color_theme)
