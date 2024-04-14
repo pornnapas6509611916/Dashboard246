@@ -7,6 +7,8 @@ Original file is located at
     https://colab.research.google.com/drive/1HywERjiYqxQw4Nvqt2hVauo4z_z0kfLW
 """
 
+pip install plotly
+
 import streamlit as st
 import pandas as pd
 import altair as alt
