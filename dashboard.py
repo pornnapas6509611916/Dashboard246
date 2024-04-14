@@ -153,6 +153,28 @@ def make_gauge(category, average):
 
     return gauge_chart
 
+data = pd.DataFrame({'Categories': Categories, 'average': average})
+
+# Define color scale for gauge
+color_scale = alt.Scale(
+    domain=[1, 2, 3, 4, 5],
+    range=['red', 'orange', 'yellow', 'lightgreen', 'green']
+)
+
+# Create Gauge Chart using Altair
+gauge_chart = alt.Chart(data).mark_bar().encode(
+    x=alt.X('Categories', title=None),
+    y=alt.Y('average', title=None, scale=alt.Scale(domain=(0, 5))),
+    color=alt.Color('average:Q', scale=color_scale, legend=None),
+    tooltip=['Categories', 'average']
+).properties(
+    width=200,
+    height=200
+)
+
+# Display the Gauge Chart
+st.altair_chart(gauge_chart, use_container_width=True)
+
 col = st.columns((1.5, 4.5, 2), gap='medium')
 
 with col[0]:
@@ -189,84 +211,3 @@ with col[2]:
     st.markdown('#### Mean Satisfaction')
     gauge_chart = make_gauge('Satisfaction', average)  # Use the function make_gauge correctly
     st.altair_chart(gauge_chart)  # Use the correct variable name for the gauge chart
-
-# Create DataFrame
-data = pd.DataFrame({'categories': categories, 'averages': averages})
-
-# Define color scale for gauge
-color_scale = alt.Scale(
-    domain=[1, 2, 3, 4, 5],
-    range=['red', 'orange', 'yellow', 'lightgreen', 'green']
-)
-
-# Create Gauge Chart using Altair
-gauge_chart = alt.Chart(data).mark_bar().encode(
-    x=alt.X('categories', title=None),
-    y=alt.Y('averages', title=None, scale=alt.Scale(domain=(0, 5))),
-    color=alt.Color('averages:Q', scale=color_scale, legend=None),
-    tooltip=['categories', 'averages']
-).properties(
-    width=200,
-    height=200
-)
-
-# Display the Gauge Chart
-st.altair_chart(gauge_chart, use_container_width=True)
-
-for i, category in enumerate(categories):
-    data = pd.DataFrame({'category': [category], 'average': [averages[i]]})
-
-    # Define color domain for the gauge
-    color_domain = [1, 1.8, 2.6, 3.4, 4.2, 5]
-    color_range = ['red', 'orange', 'yellow', 'lightgreen', 'green']
-
-    chart = alt.Chart(data).mark_bar(size=100).encode(
-        x='average:Q',
-        color=alt.Color('average:Q', scale=alt.Scale(domain=color_domain, range=color_range)),
-        tooltip=['average:Q']
-    ).properties(
-        width=200,
-        height=150
-    ).configure_view(
-        strokeWidth=0
-    ).configure_axis(
-        ticks=False,
-        labels=False
-    )
-
-    st.write(chart)
-
-def gauge_chart(category, value, min_value, max_value, label):
-    # Set up the figure and axis
-    fig, ax = plt.subplots()
-
-    # Draw the gauge
-    theta = np.linspace(0.5 * np.pi, -0.5 * np.pi, 100)
-    r = np.linspace(min_value, max_value, 100)
-    x = r * np.sin(theta)
-    y = r * np.cos(theta)
-    ax.plot(x, y, color='gray', linewidth=2)
-
-    # Draw the pointer
-    angle = (0.5 - ((value - min_value) / (max_value - min_value))) * np.pi
-    ax.plot([0, 0.9 * np.sin(angle)], [0, 0.9 * np.cos(angle)], color='red', linewidth=4)
-
-    # Add the category label
-    ax.text(0, -1.2, category, horizontalalignment='center', fontsize=14)
-
-    # Add the value label
-    ax.text(0, 1.2, label.format(value), horizontalalignment='center', fontsize=14)
-
-    # Hide the axes
-    ax.axis('off')
-
-    # Show the plot
-    plt.show()
-
-# Example usage
-category = 'Speed'
-value = 75
-min_value = 0
-max_value = 100
-label = 'Current speed: {} km/h'
-gauge_chart(category, value, min_value, max_value, label)
