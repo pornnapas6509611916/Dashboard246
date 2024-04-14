@@ -135,7 +135,7 @@ def make_donut(input_df, input_population, input_Satisfaction):
     return donut_chart
 
 # Create DataFrame
-data = pd.DataFrame({'Categories': Categories, 'average': average, 'FullScale': [5]*len(mean_values)})
+data = pd.DataFrame({'Categories': Categories, 'average': average, 'FullScale': [5]*len(average)})
 
 # Define color scale for gauge
 color_scale = alt.Scale(
