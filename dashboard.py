@@ -184,7 +184,7 @@ legend = alt.Chart(pd.DataFrame({'value': [3.5, 3.7, 3.9, 4.0, 4.2]})).mark_rect
 )
 
 with col[2]:
-# Create a selectbox for choosing categories
+    # Create a selectbox for choosing categories
     selected_category = st.selectbox('Select a category:', data['Categories'])
 
 # Filter data based on the selected category
@@ -192,10 +192,10 @@ with col[2]:
 
 # Create Gauge Chart using Altair for the selected category
     bar_chart_selected = alt.Chart(filtered_data).mark_bar().encode(
-      x=alt.X('Categories', title=None),
-      y=alt.Y('average', title=None, scale=alt.Scale(domain=(0, 5))),
-      color=alt.Color('average:Q', scale=color_scale, legend=None),
-      tooltip=['Categories', 'average']
+        x=alt.X('Categories', title=None),
+        y=alt.Y('average', title=None, scale=alt.Scale(domain=(0, 5))),
+        color=alt.Color('average:Q', scale=color_scale, legend=None),
+        tooltip=['Categories', 'average']
     ).properties(
         width=200,
         height=200
@@ -203,14 +203,14 @@ with col[2]:
 
 # Add full value text for the selected category
     text_selected = bar_chart_selected.mark_text(
-      align='center',
-      baseline='bottom',
+        align='center',
+        baseline='bottom',
         dx=0,
         dy=-5,  # ระยะห่างจากแท่งกราฟ
-      color='black',
-      fontSize=14,  # ขนาดตัวอักษร
+        color='black',
+        fontSize=14,  # ขนาดตัวอักษร
     ).encode(
-      text=alt.Text('average:Q', format='.1f')  # รูปแบบของตัวเลข (ทศนิยม 1 ตำแหน่ง)
+        text=alt.Text('average:Q', format='.1f')  # รูปแบบของตัวเลข (ทศนิยม 1 ตำแหน่ง)
     )
 
 # Combine selected Gauge Chart and Legend
