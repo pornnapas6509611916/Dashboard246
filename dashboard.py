@@ -10,7 +10,6 @@ Original file is located at
 import streamlit as st
 import pandas as pd
 import altair as alt
-import plotly.graph_objects as go
 
 st.set_page_config(
     page_title="🪸Dashboard",
@@ -204,4 +203,3 @@ for i, category in enumerate(categories):
     ))
     fig.update_layout(title=f'Satisfaction Gauge Chart - {category}')
     fig.show()
-
