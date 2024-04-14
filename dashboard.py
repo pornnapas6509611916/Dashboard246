@@ -135,18 +135,18 @@ def make_donut(input_df, input_population, input_Satisfaction):
     return donut_chart
 
 # Create DataFrame
-data = pd.DataFrame({'Categories': Categories, 'average': average, 'FullScale': [5]*len(average)})
+data = pd.DataFrame({'Categories': Categories, 'average': average})
 
 # Define color scale for gauge
 color_scale = alt.Scale(
-    domain=[1, 2, 3, 4, 5],
+    domain=[3.5, 3.7, 3.9, 4.0, 4.2],
     range=['red', 'orange', 'yellow', 'lightgreen', 'green']
 )
 
 # Create Gauge Chart using Altair
-gauge_chart = alt.Chart(data).mark_bar().encode(
+bar_chart = alt.Chart(data).mark_bar().encode(
     x=alt.X('Categories', title=None),
-    y=alt.Y('FullScale', title=None, scale=alt.Scale(domain=(1, 5))),
+    y=alt.Y('average', title=None, scale=alt.Scale(domain=(0, 5))),
     color=alt.Color('average:Q', scale=color_scale, legend=None),
     tooltip=['Categories', 'average']
 ).properties(
@@ -155,7 +155,7 @@ gauge_chart = alt.Chart(data).mark_bar().encode(
 )
 
 # Add full value text
-text = gauge_chart.mark_text(
+text = bar_chart.mark_text(
     align='center',
     baseline='bottom',
     dx=0,
@@ -166,16 +166,19 @@ text = gauge_chart.mark_text(
     text=alt.Text('average:Q', format='.1f')  # รูปแบบของตัวเลข (ทศนิยม 1 ตำแหน่ง)
 )
 
-# Add scale rule
-rule = alt.Chart(pd.DataFrame({'value': [1, 2, 3, 4, 5]})).mark_rule(color='black', strokeWidth=2).encode(
-    y=alt.Y('value:O', axis=alt.Axis(labels=False, title=None)),
-    tooltip=['value:Q']
+bar_chart = (bar_chart + text)
+
+# Create Legend
+legend = alt.Chart(pd.DataFrame({'value': [3.5, 3.7, 3.9, 4.0, 4.2]})).mark_rect().encode(
+    y=alt.Y('value:O', axis=alt.Axis(title='Value')),
+    color=alt.Color('value:Q', scale=color_scale)
 )
 
-gauge_chart = (gauge_chart + text + rule)
+# Combine Gauge Chart and Legend
+gauge_chart_with_legend = alt.hconcat(bar_chart, legend)
 
-# Display the Gauge Chart
-st.altair_chart(gauge_chart, use_container_width=True)
+# Display the Gauge Chart with Legend
+st.altair_chart(gauge_chart_with_legend, use_container_width=True)
 
 col = st.columns((1.5, 4.5, 2), gap='medium')
 
