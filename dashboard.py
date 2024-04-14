@@ -139,19 +139,26 @@ def make_heatmap(input_df, input_y, input_x, input_color, input_color_theme):
 
   return heatmap
 
-def make_donut(input_df, input_population, input_Satisfaction):
-    donut_chart = alt.Chart(input_df).mark_arc().encode(
-        theta=f'{input_population}:Q',
-        color=alt.Color(f'{input_Satisfaction}:N', scale=alt.Scale(scheme='category20')),
-        tooltip=[f'{input_Satisfaction}', f'{input_population}']
-    ).properties(
-        width=200,
-        height=200
-    )
-
-    return donut_chart
-
 col = st.columns((3, 0.5, 4.5), gap='medium')
+
+with col[0]:
+    st.markdown('#### Population')
+
+    st.dataframe(df_selected_Categories,
+                 column_order=("Satisfaction", "population"),
+                 hide_index=True,
+                 width=None,
+                 column_config={
+                    "Satisfaction": st.column_config.TextColumn(
+                        "Satisfaction",
+                    ),
+                    "population": st.column_config.ProgressColumn(
+                        "Population",
+                        format="%f",
+                        min_value=0,
+                        max_value=60,
+                     )}
+                 )
 
 with col[2]:
     # Create a selectbox for choosing categories
