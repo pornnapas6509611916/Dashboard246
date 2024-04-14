@@ -134,13 +134,9 @@ def make_donut(input_df, input_population, input_Satisfaction):
 
     return donut_chart
 
-# Create DataFrame
-data = pd.DataFrame({'Categories': Categories, 'average': average})
-
-# Define color scale for gauge
 color_scale = alt.Scale(
-    domain=[1, 2, 3, 4, 5],
-    range=['red', 'orange', 'yellow', 'lightgreen', 'green']
+    domain=[0, 1, 2, 3, 4, 5],
+    range=['white', 'red', 'orange', 'yellow', 'lightgreen', 'green']
 )
 
 # Create Gauge Chart using Altair
@@ -166,7 +162,13 @@ text = gauge_chart.mark_text(
     text=alt.Text('average:Q', format='.1f')  # รูปแบบของตัวเลข (ทศนิยม 1 ตำแหน่ง)
 )
 
-gauge_chart = (gauge_chart + text)
+# Add full value bar
+full_value_bar = alt.Chart(pd.DataFrame({'value': [5]})).mark_bar(color='black').encode(
+    y=alt.Y('value', title=None),
+    opacity=alt.value(0.5),
+)
+
+gauge_chart = (gauge_chart + text + full_value_bar)
 
 # Display the Gauge Chart
 st.altair_chart(gauge_chart, use_container_width=True)
