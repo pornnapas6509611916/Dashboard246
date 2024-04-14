@@ -30,6 +30,8 @@ df = df.rename(columns={' [ด้านการเดินทางและ�
                          ' [ด้านสุขภาพ]': 'ด้านสุขภาพ',
                          ' [ด้านสิ่งแวดล้อม]': 'ด้านสิ่งแวดล้อม'})
 
+
+
 counts_5 = []
 counts_4 = []
 counts_3 = []
@@ -42,6 +44,19 @@ for category_column in ['ด้านการเดินทางและค�
     counts_3.append(df[category_column].value_counts().get(3, 0))
     counts_2.append(df[category_column].value_counts().get(2, 0))
     counts_1.append(df[category_column].value_counts().get(1, 0))
+
+mean = df[['ด้านการเดินทางและความปลอดภัย', 'ด้านการศึกษา', 'ด้านสุขภาพ', 'ด้านสิ่งแวดล้อม']].mean()
+mean = mean.round(2)
+mean
+
+data = {
+    'Categories': ['ด้านการเดินทางและความปลอดภัย', 'ด้านการศึกษา', 'ด้านสุขภาพ', 'ด้านสิ่งแวดล้อม'],
+    'mean' : mean
+}
+
+df2 = pd.DataFrame(data)
+
+df2
 
 data = {
     'Categories': ['การเดินทางและความปลอดภัย', 'การศึกษา', 'สุขภาพ', 'สิ่งแวดล้อม'],
@@ -102,10 +117,12 @@ def make_heatmap(input_df, input_y, input_x, input_color, input_color_theme):
 
   return heatmap
 
-def make_donut(input_df, input_population, input_Satisfaction):
+def make_donut(input_df, input_population, input_Satisfaction, input_color, input_color_theme):
     donut_chart = alt.Chart(input_df).mark_arc().encode(
         theta=f'{input_population}:Q',
-        color=alt.Color(f'{input_Satisfaction}:N', scale=alt.Scale(scheme='category20')),
+        color=alt.Color(f'max({input_color}):Q',
+                        legend=alt.Legend(title=" "),
+                        scale=alt.Scale(scheme=input_color_theme)),
         tooltip=[f'{input_Satisfaction}', f'{input_population}']
     ).properties(
         width=200,
@@ -115,13 +132,35 @@ def make_donut(input_df, input_population, input_Satisfaction):
 
     return donut_chart
 
+def make_gauge(input_df2, input_Categories, input_mean):
+    gauge_chart = alt.Chart(input_df2).mark_arc().encode(
+        theta=f'{input_mean}:Q',
+        color=alt.Color(f'{input_mean}:N', scale=alt.Scale(scheme='category20')),
+        tooltip=[f'{input_Categories}', f'{input_mean}']
+    ).properties(
+        width=200,
+        height=200,
+        title='Gauge Chart'
+    )
+
+    gauge_chart = gauge_chart.properties(
+        angle=90,
+        arc=alt.Arc(
+            innerRadius=0.6,
+            outerRadius=0.9
+        )
+    )
+
+    return gauge_chart
+
 col = st.columns((1.5, 4.5, 2), gap='medium')
 
 with col[0]:
-    donut_chart = make_donut(df_selected_Categories, 'population', 'Satisfaction')
+    donut_chart = make_donut(df_selected_Categories, 'population', 'Satisfaction', 'color_column', selected_color_theme)
     st.altair_chart(donut_chart)
 
-with col[1]:
+
+with col[0]:
     st.markdown('#### Total Categories')
 
     heatmap = make_heatmap(df_reshaped, 'Satisfaction', 'Categories', 'population', selected_color_theme)
@@ -142,6 +181,6 @@ with col[2]:
                         "Population",
                         format="%f",
                         min_value=0,
-                        max_value=max(df_selected_Categories.population),
+                        max_value=max(df_selected_Categories_sorted.population),
                      )}
                  )
