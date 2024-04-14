@@ -141,6 +141,31 @@ with col[0]:
     donut_chart = make_donut(df_selected_Categories, 'population', 'Satisfaction')
     st.altair_chart(donut_chart)
 
+with col[0]:
+    st.markdown('#### Top Population')
+
+    st.dataframe(df_selected_Categories,
+                 column_order=("Satisfaction", "population"),
+                 hide_index=True,
+                 width=None,
+                 column_config={
+                    "Satisfaction": st.column_config.TextColumn(
+                        "Satisfaction",
+                    ),
+                    "population": st.column_config.ProgressColumn(
+                        "Population",
+                        format="%f",
+                        min_value=0,
+                        max_value=max(df_selected_Categories_sorted.population),
+                     )}
+                 )
+
+with col[1]:
+    st.markdown('#### Total Ranking')
+
+    heatmap = make_heatmap(df_reshaped, 'Satisfaction', 'Categories', 'population', selected_color_theme)
+    st.altair_chart(heatmap, use_container_width=True)
+
 # Create DataFrame
 data = pd.DataFrame({'Categories': Categories, 'average': average})
 
@@ -186,28 +211,3 @@ gauge_chart_with_legend = alt.hconcat(bar_chart, legend)
 
 # Display the Gauge Chart with Legend
 st.altair_chart(gauge_chart_with_legend, use_container_width=True)
-
-with col[1]:
-    st.markdown('#### Top States')
-
-    st.dataframe(df_selected_Categories,
-                 column_order=("Satisfaction", "population"),
-                 hide_index=True,
-                 width=None,
-                 column_config={
-                    "Satisfaction": st.column_config.TextColumn(
-                        "Satisfaction",
-                    ),
-                    "population": st.column_config.ProgressColumn(
-                        "Population",
-                        format="%f",
-                        min_value=0,
-                        max_value=max(df_selected_Categories_sorted.population),
-                     )}
-                 )
-
-with col[1]:
-    st.markdown('#### Total Ranking')
-
-    heatmap = make_heatmap(df_reshaped, 'Satisfaction', 'Categories', 'population', selected_color_theme)
-    st.altair_chart(heatmap, use_container_width=True)
