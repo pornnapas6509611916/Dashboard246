@@ -134,25 +134,7 @@ def make_donut(input_df, input_population, input_Satisfaction):
 
     return donut_chart
 
-# Create a function to generate the gauge chart for a category
-def make_gauge(category, average):
-    color_scale = alt.Scale(
-
-        domain=[1, 1.8, 2.6, 3.4, 4.2, 5],
-        range=["red", "orange", "yellow", "lightgreen", "green"]
-    )
-
-    gauge_chart = alt.Chart(pd.DataFrame({'Category': [category], 'Average': [average]})).mark_bar().encode(
-        x=alt.X('Average:Q', axis=None),
-        color=alt.Color('Average:Q', scale=color_scale, legend=None)
-    ).properties(
-        title=category,
-        width=200,
-        height=100
-    )
-
-    return gauge_chart
-
+# Create DataFrame
 data = pd.DataFrame({'Categories': Categories, 'average': average})
 
 # Define color scale for gauge
@@ -171,6 +153,20 @@ gauge_chart = alt.Chart(data).mark_bar().encode(
     width=200,
     height=200
 )
+
+# Add full value text
+text = gauge_chart.mark_text(
+    align='center',
+    baseline='bottom',
+    dx=0,
+    dy=-5,  # ระยะห่างจากแท่งกราฟ
+    color='black',
+    fontSize=14,  # ขนาดตัวอักษร
+).encode(
+    text=alt.Text('average:Q', format='.1f')  # รูปแบบของตัวเลข (ทศนิยม 1 ตำแหน่ง)
+)
+
+gauge_chart = (gauge_chart + text)
 
 # Display the Gauge Chart
 st.altair_chart(gauge_chart, use_container_width=True)
@@ -206,8 +202,3 @@ with col[2]:
                         max_value=max(df_selected_Categories_sorted.population),
                      )}
                  )
-
-with col[2]:
-    st.markdown('#### Mean Satisfaction')
-    gauge_chart = make_gauge('Satisfaction', average)  # Use the function make_gauge correctly
-    st.altair_chart(gauge_chart)  # Use the correct variable name for the gauge chart
