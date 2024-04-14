@@ -71,19 +71,6 @@ df_reshaped = pd.melt(df, id_vars=['Categories'], value_vars=['Satisfaction_5','
 # แสดง DataFrame ที่ได้
 print(df_reshaped)
 
-with st.sidebar:
-    st.title('Categories')
-
-    Categories = list(df_reshaped.Categories.unique())[::-1]
-
-    selected_Categories = st.selectbox('Select a Categories', Categories, index=len(Categories)-1)
-    df_selected_Categories = df_reshaped[df_reshaped.Categories == selected_Categories]
-    df_selected_Categories_sorted = df_selected_Categories.sort_values(by="population", ascending=False)
-
-    color_theme_list = ['blues', 'cividis', 'greens', 'inferno', 'magma', 'plasma', 'reds', 'rainbow', 'turbo', 'viridis']
-    selected_color_theme = st.selectbox('Select a color theme', color_theme_list)
-    print(df_selected_Categories_sorted)
-
 # คำนวณค่าเฉลี่ยของความพึงพอใจในหมวดหมู่การศึกษาตามวิธีที่ระบุ
 avg1 = ((df_reshaped[df_reshaped['Categories'] == 'การเดินทางและความปลอดภัย']['population'] * df_reshaped[df_reshaped['Categories'] == 'การเดินทางและความปลอดภัย']['Satisfaction'].str[-1].astype(int)).sum() / 102).round(2)
 avg2 = ((df_reshaped[df_reshaped['Categories'] == 'การศึกษา']['population'] * df_reshaped[df_reshaped['Categories'] == 'การศึกษา']['Satisfaction'].str[-1].astype(int)).sum() / 102).round(2)
@@ -93,6 +80,37 @@ avg4 = ((df_reshaped[df_reshaped['Categories'] == 'สิ่งแวดล้�
 print(avg1, avg2, avg3, avg4)
 
 average = [avg1, avg2, avg3, avg4]
+
+# Create DataFrame
+data = pd.DataFrame({
+    'Categories': ['การเดินทางและความปลอดภัย', 'การศึกษา', 'สุขภาพ', 'สิ่งแวดล้อม'],
+    'average': average
+})
+
+# Define color scale for gauge
+color_scale = alt.Scale(
+    domain=[3.5, 3.7, 3.9, 4.0, 4.2],
+    range=['red', 'orange', 'yellow', 'lightgreen', 'green']
+)
+
+# Create Legend
+legend = alt.Chart(pd.DataFrame({'value': [3.5, 3.7, 3.9, 4.0, 4.2]})).mark_rect().encode(
+    y=alt.Y('value:O', axis=alt.Axis(title='Value')),
+    color=alt.Color('value:Q', scale=color_scale)
+)
+
+with st.sidebar:
+    st.title('Categories')
+
+    Categories = list(data.Categories.unique())[::-1]
+
+    selected_Categories = st.selectbox('Select a Categories', Categories, index=len(Categories)-1)
+    df_selected_Categories = data[data.Categories == selected_Categories]
+    df_selected_Categories_sorted = df_selected_Categories.sort_values(by="average", ascending=False)
+
+    color_theme_list = ['blues', 'cividis', 'greens', 'inferno', 'magma', 'plasma', 'reds', 'rainbow', 'turbo', 'viridis']
+    selected_color_theme = st.selectbox('Select a color theme', color_theme_list)
+    print(df_selected_Categories)
 
 import altair as alt
 
@@ -134,54 +152,6 @@ def make_donut(input_df, input_population, input_Satisfaction):
     return donut_chart
 
 col = st.columns((3, 0.5, 4.5), gap='medium')
-
-with col[0]:
-    st.markdown('#### Satisfaction')
-    donut_chart = make_donut(df_selected_Categories, 'population', 'Satisfaction')
-    st.altair_chart(donut_chart)
-
-with col[0]:
-    st.markdown('#### Population')
-
-    st.dataframe(df_selected_Categories,
-                 column_order=("Satisfaction", "population"),
-                 hide_index=True,
-                 width=None,
-                 column_config={
-                    "Satisfaction": st.column_config.TextColumn(
-                        "Satisfaction",
-                    ),
-                    "population": st.column_config.ProgressColumn(
-                        "Population",
-                        format="%f",
-                        min_value=0,
-                        max_value=max(df_selected_Categories_sorted.population),
-                     )}
-                 )
-
-with col[2]:
-    st.markdown('#### Satisfaction')
-
-    heatmap = make_heatmap(df_reshaped, 'Satisfaction', 'Categories', 'population', selected_color_theme)
-    st.altair_chart(heatmap, use_container_width=True)
-
-# Create DataFrame
-data = pd.DataFrame({
-    'Categories': ['การเดินทางและความปลอดภัย', 'การศึกษา', 'สุขภาพ', 'สิ่งแวดล้อม'],
-    'average': average
-})
-
-# Define color scale for gauge
-color_scale = alt.Scale(
-    domain=[3.5, 3.7, 3.9, 4.0, 4.2],
-    range=['red', 'orange', 'yellow', 'lightgreen', 'green']
-)
-
-# Create Legend
-legend = alt.Chart(pd.DataFrame({'value': [3.5, 3.7, 3.9, 4.0, 4.2]})).mark_rect().encode(
-    y=alt.Y('value:O', axis=alt.Axis(title='Value')),
-    color=alt.Color('value:Q', scale=color_scale)
-)
 
 with col[2]:
     # Create a selectbox for choosing categories
