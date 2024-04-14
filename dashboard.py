@@ -134,7 +134,7 @@ def make_donut(input_df, input_population, input_Satisfaction):
 
     return donut_chart
 
-col = st.columns((4.5, 0.5, 4.5), gap='medium')
+col = st.columns((3, 0.5, 4.5), gap='medium')
 
 with col[0]:
     st.markdown('#### Satisfaction')
@@ -142,7 +142,7 @@ with col[0]:
     st.altair_chart(donut_chart)
 
 with col[0]:
-    st.markdown('#### Top Population')
+    st.markdown('#### Population')
 
     st.dataframe(df_selected_Categories,
                  column_order=("Satisfaction", "population"),
