@@ -134,7 +134,7 @@ def make_donut(input_df, input_population, input_Satisfaction):
 
     return donut_chart
 
-col = st.columns((1.5, 4.5, 2), gap='medium')
+col = st.columns((4.5, 0.5, 4.5), gap='medium')
 
 with col[0]:
     st.markdown('#### Satisfaction')
