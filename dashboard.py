@@ -30,8 +30,6 @@ df = df.rename(columns={' [ด้านการเดินทางและ�
                          ' [ด้านสุขภาพ]': 'ด้านสุขภาพ',
                          ' [ด้านสิ่งแวดล้อม]': 'ด้านสิ่งแวดล้อม'})
 
-
-
 counts_5 = []
 counts_4 = []
 counts_3 = []
@@ -45,18 +43,23 @@ for category_column in ['ด้านการเดินทางและค�
     counts_2.append(df[category_column].value_counts().get(2, 0))
     counts_1.append(df[category_column].value_counts().get(1, 0))
 
-mean = df[['ด้านการเดินทางและความปลอดภัย', 'ด้านการศึกษา', 'ด้านสุขภาพ', 'ด้านสิ่งแวดล้อม']].mean()
-mean = mean.round(2)
-mean
+mean = df[['ด้านการเดินทางและความปลอดภัย', 'ด้านการศึกษา', 'ด้านสุขภาพ', 'ด้านสิ่งแวดล้อม']].mean().round(2)
+mean_data = {
+    'Categories': ['ด้านการเดินทางและความปลอดภัย', 'ด้านการศึกษา', 'ด้านสุขภาพ', 'ด้านสิ่งแวดล้อม'],
+    'Mean': mean
+}
+df_mean = pd.DataFrame(mean_data)
+
+
 
 data = {
-    'Categories': ['ด้านการเดินทางและความปลอดภัย', 'ด้านการศึกษา', 'ด้านสุขภาพ', 'ด้านสิ่งแวดล้อม'],
-    'mean' : mean
+    'Categories': ['การเดินทางและความปลอดภัย', 'การศึกษา', 'สุขภาพ', 'สิ่งแวดล้อม'],
+    'Satisfaction_5': counts_5,
+    'Satisfaction_4': counts_4,
+    'Satisfaction_3': counts_3,
+    'Satisfaction_2': counts_2,
+    'Satisfaction_1': counts_1
 }
-
-df2 = pd.DataFrame(data)
-
-df2
 
 data = {
     'Categories': ['การเดินทางและความปลอดภัย', 'การศึกษา', 'สุขภาพ', 'สิ่งแวดล้อม'],
@@ -117,12 +120,10 @@ def make_heatmap(input_df, input_y, input_x, input_color, input_color_theme):
 
   return heatmap
 
-def make_donut(input_df, input_population, input_Satisfaction, input_color, input_color_theme):
+def make_donut(input_df, input_population, input_Satisfaction):
     donut_chart = alt.Chart(input_df).mark_arc().encode(
         theta=f'{input_population}:Q',
-        color=alt.Color(f'max({input_color}):Q',
-                        legend=alt.Legend(title=" "),
-                        scale=alt.Scale(scheme=input_color_theme)),
+        color=alt.Color(f'{input_Satisfaction}:N', scale=alt.Scale(scheme='category20')),
         tooltip=[f'{input_Satisfaction}', f'{input_population}']
     ).properties(
         width=200,
@@ -156,9 +157,9 @@ def make_gauge(input_df2, input_Categories, input_mean):
 col = st.columns((1.5, 4.5, 2), gap='medium')
 
 with col[0]:
-    donut_chart = make_donut(df_selected_Categories, 'population', 'Satisfaction', 'color_column', selected_color_theme)
+    st.markdown('#### Satisfaction')
+    donut_chart = make_donut(df_selected_Categories, 'population', 'Satisfaction')
     st.altair_chart(donut_chart)
-
 
 with col[0]:
     st.markdown('#### Total Categories')
